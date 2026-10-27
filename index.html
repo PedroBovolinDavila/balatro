@@ -72,6 +72,7 @@ const T=[
 {n:'A Imperatriz',d:'Até 2 cartas ganham +4 Mult',k:2,f:cs=>cs.map(c=>c.mu=(c.mu||0)+4)},
 {n:'O Hierofante',d:'Até 2 cartas ganham +30 Fichas',k:2,f:cs=>cs.map(c=>c.ch=(c.ch||0)+30)},
 {n:'O Eremita',d:'Dobra seu dinheiro (máx +$20)',k:0,f:()=>S.money+=Math.min(S.money,20)}];
+T.forEach(t=>t.p=t.n=='O Eremita'?4:3);
 const V=[
 {n:'Mãos Extras',d:'+1 mão por rodada',p:10,f:()=>S.hands++},
 {n:'Descartes Extras',d:'+1 descarte por rodada',p:10,f:()=>S.discards++},
@@ -132,7 +133,7 @@ function fl(m){S.msg=m;render();setTimeout(()=>{S.msg='';render()},1800);return 
 function give(it){if(it.t=='j'){if(S.jokers.length>=S.js)return fl('Sem slot de coringa');S.jokers.push(it.o)}
 else if(it.t=='t'){if(S.cons.length>=S.cs)return fl('Sem slot de consumível');S.cons.push(it.o)}
 else if(it.t=='p')S.lv[it.i]++;else{it.o.f();S.vo.push(it.o.n)}return 1}
-function buy(i){const it=S.sp.l[i];if(!it)return;const x=inf(it),p=pr(x.p);if(S.money<p)return fl('Dinheiro insuficiente');
+function buy(i){const it=S.sp.l[i];if(!it)return;const x=inf(it),p=pr(x.p||3);if(S.money<p)return fl('Dinheiro insuficiente');
 if(it.t=='k'){const k=x.kind;S.pa=1;S.pack=k=='j'?sh(J.filter(j=>!S.jokers.includes(j))).slice(0,3).map(o=>({t:'j',o})):k=='p'?sh([...Array(9).keys()]).slice(0,3).map(i=>({t:'p',i})):sh(T.slice()).slice(0,3).map(o=>({t:'t',o}))}
 else if(!give(it))return;S.money-=p;S.sp.l[i]=null;snd(SF.buy);render()}
 function pick(i){if(i>=0&&!give(S.pack[i]))return;S.pack=null;render()}
@@ -151,7 +152,7 @@ const jr=()=>`<div class="st" style="font-size:11px;color:var(--m)"><span>Coring
 function tip(k,i){if(busy)return;S.tip={k,i};S.ta=1;render()}
 const tipH=()=>{if(!S.tip)return'';const{k,i}=S.tip,o=k=='j'?S.jokers[i]:S.cons[i];if(!o)return'';return`<div class="tip pn"><b>${o.n}</b><div style="color:var(--m);font-weight:400;margin:4px 0 8px">${o.d}</div><div class="row">${k=='j'?`<button class="o" style="flex:1" onclick="sj(${i})">Vender $${o.p>>1}</button>`:`<button style="flex:1" onclick="use(${i})">Usar</button>`}<button class="s" onclick="S.tip=null;render()">Fechar</button></div></div>`};
 const tp=()=>`<div class="pn st"><span>Ante <b style="font-size:18px">${S.ante}</b>/8</span><b style="color:var(--g);font-size:22px">$${S.money}</b><span><button class="s" onclick="info()">Níveis</button><button class="s" onclick="MUTE^=1;render()">${MUTE?'🔇':'🔊'}</button></span></div>`;
-const itm=(it,i)=>{if(!it)return`<div class="pn" style="opacity:.4;text-align:center">Vendido</div>`;const x=inf(it);return`<button class="it" onclick="buy(${i})"><i>${ico(it)}</i><span style="flex:1"><b>${x.n}</b><small>${x.d}</small></span><b style="color:var(--g);font-size:18px">$${pr(x.p)}</b></button>`};
+const itm=(it,i)=>{if(!it)return`<div class="pn" style="opacity:.4;text-align:center">Vendido</div>`;const x=inf(it);return`<button class="it" onclick="buy(${i})"><i>${ico(it)}</i><span style="flex:1"><b>${x.n}</b><small>${x.d}</small></span><b style="color:var(--g);font-size:18px">$${pr(x.p||3)}</b></button>`};
 const BC=['var(--b)','var(--o)','var(--r)'];
 const scr={
 menu:()=>`<h1>${[...'CORINGA'].map(c=>`<span>${c}</span>`).join('')}</h1><div class="msg">Escolha seu baralho</div>${DK.map((d,i)=>`<button class="it" onclick="newRun(${i})"><i>${['🟥','🟦','⬛','👻'][i]}</i><span><b>${d[0]}</b><small>${d[1]}</small></span></button>`).join('')}`,
