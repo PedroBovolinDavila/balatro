@@ -1,4 +1,4 @@
-const V='coringa-v3';
+const V='coringa-v4';
 const LOCAL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./three.min.js','./gsap.min.js'];
 const CDN=['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(V).then(c=>Promise.all([...LOCAL,...CDN].map(u=>c.add(u).catch(()=>{})))))});
