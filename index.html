@@ -53,6 +53,16 @@ button.it{display:flex;align-items:center;gap:10px;width:calc(100% - 6px);backgr
 body.dg #crt{animation:dgp 1.1s ease-in-out infinite}
 @keyframes dgp{0%,100%{box-shadow:inset 0 0 90px #000b,inset 0 0 40px #f002}50%{box-shadow:inset 0 0 90px #000b,inset 0 0 130px #f008}}
 body.hy #crt{box-shadow:inset 0 0 90px #000b,inset 0 0 90px #f5b24466}
+
+.gd{animation:fl 3s ease-in-out infinite;filter:drop-shadow(0 0 10px #f5b244aa);flex:none}.gd svg{width:100%;display:block}
+.tb{position:fixed;inset:0;z-index:3}
+.tv{position:fixed;left:8px;right:8px;bottom:10px;max-width:464px;margin:auto;display:flex;gap:10px;align-items:flex-start;z-index:8;border:2px solid var(--g)}
+.tv .gd{width:64px}.tt{margin:4px 0 8px;font-weight:400;font-size:13px;line-height:1.35}
+.tuh{outline:3px solid #fff;outline-offset:2px;border-radius:10px;animation:tuh .9s ease-in-out infinite}
+@keyframes tuh{50%{outline-color:var(--g)}}
+input[type=range]{width:100%;height:30px;accent-color:var(--g);margin:2px 0 10px}
+.jk.tcj{background:none;box-shadow:0 3px 0 2px var(--ol),0 0 10px #f5b24455;padding:0;display:block;aspect-ratio:.714;max-width:62px;overflow:hidden;border-radius:5px}
+.jk.tcj i{display:block;width:100%;height:100%;font-size:0}.jk.em{aspect-ratio:.714;max-width:62px}
 </style></head><body><canvas id="bg"></canvas><div id="crt"></div><div id="app"></div><script>
 const sl=ms=>new Promise(r=>setTimeout(r,ms)),rnd=a=>a[Math.random()*a.length|0],sh=a=>{for(let i=a.length;i>1;){let j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const SU='♠♥♦♣',RL=r=>({11:'J',12:'Q',13:'K',14:'A'}[r]||r),N=n=>Math.round(n).toLocaleString('pt-BR');
@@ -109,14 +119,14 @@ const g=Object.values(cnt).sort((a,b)=>b-a),fl=n==5&&cs.every(c=>c.s==cs[0].s),r
 st=n==5&&rs.length==5&&(rs[4]-rs[0]==4||rs.join()=='2,3,4,5,14'),a=g[0],b=g[1]||0;
 const h=st&&fl?8:a==4?7:a==3&&b==2?6:fl?5:st?4:a==3?3:a==2&&b==2?2:a==2?1:0;
 const sc=[4,5,6,8].includes(h)?cs:h==0?[cs.reduce((x,y)=>y.r>x.r?y:x)]:cs.filter(c=>cnt[c.r]>=2);return{h,sc}}
-function newRun(i){S={scr:'blind',ante:1,st:0,money:4,hands:4,discards:3,hs:8,js:5,cs:2,jokers:[],cons:[rnd(T)],lv:Array(9).fill(1),vo:[],bosses:{},sel:new Set(),ic:5,disc:1,sort:'r',cards:[],msg:''};
+function newRun(i){S={scr:'blind',ante:1,st:0,money:4,hands:4,discards:3,hs:8,js:5,cs:2,jokers:[],cons:[rnd(T)],lv:Array(9).fill(1),vo:[],bosses:{},sel:new Set(),ic:5,disc:1,sort:'r',cards:[],msg:'',rs:{n:0,best:0,bn:'',d:0}};
 let id=0;for(let s=0;s<4;s++)for(let r=2;r<15;r++)S.cards.push({id:id++,r,s});DK[i][2]();render()}
 const srt=()=>S.hand.sort(S.sort=='r'?(a,b)=>b.r-a.r||a.s-b.s:(a,b)=>a.s-b.s||b.r-a.r);
 const fill=()=>{while(S.hand.length<S.hs&&S.draw.length){const c=S.draw.pop();S.hand.push(c);(S.nw=S.nw||[]).push(c.id)}srt()};
 function go(){S.draw=sh(S.cards.slice());S.hand=[];S.nw=[];S.pp=0;S.ps=0;S.sel.clear();S.score=0;S.hl=S.hands;S.dl=S.discards;if(bid()=='agulha')S.hl=1;if(bid()=='agua')S.dl=0;fill();S.scr='round';render()}
 function tg(id){if(busy)return;const was=S.sel.has(id);was?S.sel.delete(id):S.sel.size<5&&S.sel.add(id);S.tgl=[id,was?-1:1];snd(was?SF.de:SF.se);render()}
 function srtBy(k){S.sort=k;srt();render()}
-async function disc(){if(busy||!S.sel.size||S.dl<1)return;busy=1;S.dl--;snd(SF.dc);
+async function disc(){if(busy||!S.sel.size||S.dl<1)return;busy=1;S.dl--;S.rs.d++;snd(SF.dc);
 if(window.gsap){const e=[...document.querySelectorAll('#hd .cd.sel')];if(e.length){gsap.to(e,{y:-260,x:()=>gsap.utils.random(-80,80),rotation:()=>gsap.utils.random(-60,60),opacity:0,duration:.35,stagger:.04,ease:'power2.in'});await sl(350+40*e.length)}}
 dst(S.hand.filter(c=>S.sel.has(c.id)));S.sel.clear();fill();busy=0;render()}
 async function play(){if(busy||!S.sel.size||S.hl<1)return;busy=1;
@@ -130,15 +140,15 @@ for(const c of sc){if(deb(c))continue;const c0=ch,m0=mu;P.hi=c.id;ch+=(c.r>10?c.
 for(const j of S.jokers){const e=j.k&&j.k(c);if(e){ch+=e.c||0;mu+=e.m||0;mu*=e.x||1}}await up(380,'.pn .cd.hi',c0,m0)}
 P.hi=-1;
 for(let i=0;i<S.jokers.length;i++){const j=S.jokers[i],e=j.h&&j.h({h,pc,sc});if(e){const c0=ch,m0=mu;P.hj=i;ch+=e.c||0;mu+=e.m||0;mu*=e.x||1;await up(520,'.jk.hl',c0,m0)}}
-P.hj=-1;P.tot=Math.round(ch*mu);render();snd(SF.tot);spark('.tot','#f5b244',26);kick(1.2);
+P.hj=-1;P.tot=Math.round(ch*mu);S.rs.n++;if(P.tot>S.rs.best){S.rs.best=P.tot;S.rs.bn=HD[h][0]}render();snd(SF.tot);spark('.tot','#f5b244',26);kick(1.2);
 if(window.gsap){gsap.fromTo('.tot',{scale:2.6,opacity:0},{scale:1,opacity:1,duration:.55,ease:'bounce.out'});gsap.fromTo('#app',{x:-Math.min(26,6+Math.log10(P.tot+1)*4)},{x:0,duration:.6,ease:'elastic.out(1,.3)'})}
 await sl(950);S.score+=P.tot;S.pl=null;
 if(bid()=='dente')S.money=Math.max(0,S.money-1);
 if(bid()=='gancho')S.hand.sort(()=>Math.random()-.5).splice(0,2);
-fill();busy=0;if(S.score>=tgt())return win();if(S.hl<1){S.scr='over';snd(SF.lose);return render()}render()}
-function win(){confetti();snd(SF.win);const r=[3,4,5][S.st],it=Math.min(S.ic,Math.floor(S.money/5)),gd=S.jokers.reduce((a,j)=>a+(j.g||0),0);
+fill();busy=0;if(S.score>=tgt())return win();if(S.hl<1){S.scr='over';snd(SF.lose);endRun(0);return render()}render()}
+function win(){confetti();coins(20);snd(SF.win);const r=[3,4,5][S.st],it=Math.min(S.ic,Math.floor(S.money/5)),gd=S.jokers.reduce((a,j)=>a+(j.g||0),0);
 S.rep=`Recompensa $${r} · juros $${it} · mãos restantes $${S.hl}`+(gd?` · coringas $${gd}`:'');S.money+=r+it+S.hl+gd;
-if(S.ante==8&&bs()){S.scr='won';return render()}
+if(S.ante==8&&bs()){S.scr='won';endRun(1);return render()}
 if(++S.st>2){S.st=0;S.ante++}shop();S.scr='shop';render()}
 const rt=()=>({t:'t',o:rnd(T)}),roll=()=>{const r=Math.random(),a=J.filter(j=>!S.jokers.includes(j));if(r<.5&&a.length)return{t:'j',o:rnd(a)};if(r<.78)return{t:'p',i:Math.random()*9|0};return{t:'t',o:rnd(T)}};
 function shop(){const av=V.filter(v=>!S.vo.includes(v.n));S.sp={rr:5,l:[roll(),rt(),av.length?{t:'v',o:rnd(av)}:null,...sh(PK.slice()).slice(0,2).map(o=>({t:'k',o}))]};S.msg=''}
@@ -149,7 +159,7 @@ else if(it.t=='t'){if(S.cons.length>=S.cs)return fl('Sem slot de consumível');S
 else if(it.t=='p')S.lv[it.i]++;else{it.o.f();S.vo.push(it.o.n)}return 1}
 function buy(i){const it=S.sp.l[i];if(!it)return;const x=inf(it),p=pr(x.p||3);if(S.money<p)return fl('Dinheiro insuficiente');
 if(it.t=='k'){const k=x.kind;S.pa=1;S.pack=k=='j'?sh(J.filter(j=>!S.jokers.includes(j))).slice(0,3).map(o=>({t:'j',o})):k=='p'?sh([...Array(9).keys()]).slice(0,3).map(i=>({t:'p',i})):sh(T.slice()).slice(0,3).map(o=>({t:'t',o}))}
-else if(!give(it))return;S.money-=p;S.sp.l[i]=null;snd(SF.buy);render()}
+else if(!give(it))return;pop('#app>.pn.st>b','-$'+p,'#ff6b60',10);coins(6);S.money-=p;S.sp.l[i]=null;snd(SF.buy);render()}
 function pick(i){if(i>=0&&!give(S.pack[i]))return;S.pack=null;render()}
 function reroll(){if(S.money<S.sp.rr)return fl('Dinheiro insuficiente');S.money-=S.sp.rr++;S.sp.l[0]=roll();S.sp.l[1]=rt();render()}
 function sj(i){S.money+=S.jokers[i].p>>1;S.jokers.splice(i,1);S.tip=null;render()}
@@ -167,7 +177,9 @@ const TP=['..#####..|.#ooooo#.|#oo#o#oo#|#o#ooo#o#|#ooooooo#|#o#ooo#o#|#oo#o#oo#
 '#...#...#|##..#..##|#o#.#.#o#|#oo#o#oo#|#ooooooo#|#ooooooo#|#########|.#.#.#.#.|.........',
 '....#....|...###...|....#....|.#######.|....#....|.#######.|....#....|...###...|....#....',
 '...###...|....#....|..#####..|.#ooooo#.|.#ooooo#.|.#ooooo#.|..#####..|...###...|....#....'].map(x=>x.split('|').join(''));
+TP.push(...['#.......#|##..#..##|.##.#.##.|..#####..|..#ooo#..|.#######.|.#o#o#o#.|..#####..|.........', '....#....|...#o#...|..#ooo#..|.#ooooo#.|#ooooooo#|.#ooooo#.|..#ooo#..|...#o#...|....#....', '.##...##.|#oo#.#oo#|#ooo#ooo#|#ooooooo#|.#ooooo#.|..#ooo#..|...#o#...|....#....|.........', '....#....|...#o#...|..#ooo#..|.#ooooo#.|#ooooooo#|#oo#o#oo#|.##.#.##.|...###...|.........', '...###...|..#ooo#..|...#o#...|.##o#o##.|#ooo#ooo#|.##o#o##.|...#o#...|..#ooo#..|.#######.', '.###.###.|#ooo#ooo#|#o#o#o#o#|#ooo#ooo#|.###.###.|...#.#...|..#...#..|.........|.........', '..#####..|..#ooo#..|..#ooo#..|..#ooo#..|..#####..|#########|.#ooooo#.|..#####..|.........', '.....##..|....#oo#.|...#oo#..|..#oo#...|.#oo####.|#oo#..#o#|#o#...#o#|.#.....#.|.........', '....#....|.#..#..#.|..#.#.#..|...###...|#########|...###...|..#.#.#..|.#..#..#.|....#....', '.#####...|.#ooo#...|.#oo.##..|.#ooo#o#.|..####o#.|.....#o#.|.....###.|.........|.........', '.#.......|.#######.|.#ooooo#.|.#ooooo#.|.#######.|.#.......|.#.......|.#.......|###......', '..#####..|.#ooooo#.|#o#ooo#o#|#ooooooo#|#o#ooo#o#|#oo###oo#|.#ooooo#.|..#####..|.........', '.#######.|#ooooooo#|#o##o##o#|#o##o##o#|#ooo#ooo#|.#ooooo#.|..#o#o#..|..#####..|.........', '#...#...#|##.###.##|#o#ooo#o#|#ooooooo#|#ooooooo#|#########|.........|.........|.........', '..#####..|.#ooooo#.|#oo###oo#|#o#o#o#o#|#oo###oo#|.#ooooo#.|..#####..|.........|.........'].map(x=>x.split('|').join('')));
 const TR=['XXI','XIX','XVII','XVIII','XI','XII','III','V','IX'],TCL=['#4aa3ff','#ffb21e','#ffe27a','#c9b6ff','#ff7a5c','#9aa6b2','#ff6fa5','#8be28b','#ffcf5a'];
+J.forEach((j,i)=>{TR.push('★');TCL.push(`hsl(${i*53%360},80%,65%)`)});
 function tar(i){let r='';[...TP[i]].forEach((c,k)=>{if(c!='.')r+=`<rect x="${12+k%9*4}" y="${24+(k/9|0)*4}" width="4" height="4" fill="${c=='#'?'#f5d27a':TCL[i]}"/>`});
 const q=(x,y,f='#f5b244')=>`<rect x="${x}" y="${y}" width="4" height="4" fill="${f}"/>`;
 return`<svg viewBox="0 0 60 84" shape-rendering="crispEdges"><rect width="60" height="84" rx="4" fill="#0f171a"/><rect x="2" y="2" width="56" height="80" rx="3" fill="#25134a" stroke="#f5b244" stroke-width="2"/><rect x="2" y="2" width="56" height="30" rx="3" fill="#3b2263" opacity=".55"/><rect x="6" y="6" width="48" height="72" fill="none" stroke="#f5d27a" stroke-width="1"/>${q(5,5)}${q(51,5)}${q(5,75)}${q(51,75)}<circle cx="30" cy="42" r="22" fill="${TCL[i]}" opacity=".16"/><circle cx="30" cy="42" r="22" fill="none" stroke="#f5b244" stroke-width="1" stroke-dasharray="2 2"/>${q(14,12,'#f5d27a')}${q(42,12,'#f5d27a')}${q(10,40,'#8a5fd0')}${q(46,40,'#8a5fd0')}${q(18,64,'#8a5fd0')}${q(38,64,'#8a5fd0')}${r}<text x="30" y="17" font-size="7" text-anchor="middle" fill="#f5d27a" font-family="Courier New,monospace" font-weight="700">${TR[i]}</text>${q(22,69)}${q(28,69,'#fff')}${q(34,69)}</svg>`}
@@ -175,32 +187,34 @@ function reveal(i){if(!window.gsap)return;const d=document.createElement('div');
 gsap.fromTo(d,{scale:.2,rotationY:180,opacity:0,transformPerspective:600},{scale:1,rotationY:0,opacity:1,duration:.5,ease:'back.out(1.6)',onComplete:()=>spark('.rv','#f5d27a',22)});
 gsap.to(d,{scale:1.7,opacity:0,y:-90,duration:.45,delay:1,ease:'power2.in',onComplete:()=>d.remove()})}
 const EM=['🃏','🍬','💘','🗡️','😡','🧠','🎩','🏃','🧊','👯','🚩','😀','☠️','👑','🐷'];
-const ico=it=>it.t=='j'?EM[J.indexOf(it.o)]:it.t=='t'?tar(T.indexOf(it.o)):it.t=='p'?'🪐':it.t=='v'?'🎟️':'📦';
+const ico=it=>it.t=='j'?tar(9+J.indexOf(it.o)):it.t=='t'?tar(T.indexOf(it.o)):it.t=='p'?'🪐':it.t=='v'?'🎟️':'📦';
 const FC={11:'🛡️',12:'👸',13:'🤴'},TE=['🌍','☀️','⭐','🌙','💪','🪢','👑','📜','🏮'];
 const cd=(c,k='')=>`<div class="cd s${c.s} ${k} ${deb(c)?'deb':''}" data-id="${c.id}" ${c.r>10&&c.r<14?`data-f="${FC[c.r]}"`:''} onclick="tg(${c.id})"><b>${RL(c.r)}</b><span>${SU[c.s]}</span>${c.ch?`<u>+${c.ch}</u>`:''}${c.mu?`<u class="m">+${c.mu}</u>`:''}</div>`;
-const jr=()=>`<div class="st" style="font-size:11px;color:var(--m)"><span>Coringas ${S.jokers.length}/${S.js}</span><span>Tarôs ${S.cons.length}/${S.cs}</span></div><div class="row">${Array.from({length:S.js},(_,i)=>{const j=S.jokers[i];return j?`<div class="jk ${S.pl&&S.pl.hj==i?'hl':''}" style="--h:${J.indexOf(j)*53%360}" onclick="tip('j',${i})"><i>${EM[J.indexOf(j)]}</i><b>${j.n}</b></div>`:'<div class="jk em"></div>'}).join('')}</div>
+const jr=()=>`<div class="st" style="font-size:11px;color:var(--m)"><span>Coringas ${S.jokers.length}/${S.js}</span><span>Tarôs ${S.cons.length}/${S.cs}</span></div><div class="row">${Array.from({length:S.js},(_,i)=>{const j=S.jokers[i];return j?`<div class="jk tcj ${S.pl&&S.pl.hj==i?'hl':''}" onclick="tip('j',${i})"><i>${tar(9+J.indexOf(j))}</i></div>`:'<div class="jk em"></div>'}).join('')}</div>
 <div class="row cons">${Array.from({length:S.cs},(_,i)=>{const t=S.cons[i];return t?`<div class="tc" onclick="tip('c',${i})">${tar(T.indexOf(t))}</div>`:'<div class="tc em"></div>'}).join('')}</div>`;
 function tip(k,i){if(busy)return;S.tip={k,i};S.ta=1;render()}
-const tipH=()=>{if(!S.tip)return'';const{k,i}=S.tip,o=k=='j'?S.jokers[i]:S.cons[i];if(!o)return'';return`<div class="tip pn">${k=='c'?`<div style="float:left;width:46px;margin-right:10px">${tar(T.indexOf(o))}</div>`:''}<b>${o.n}</b><div style="color:var(--m);font-weight:400;margin:4px 0 8px">${o.d}</div><div class="row" style="clear:both">${k=='j'?`<button class="o" style="flex:1" onclick="sj(${i})">Vender $${o.p>>1}</button>`:`<button style="flex:1" onclick="use(${i})">Usar</button>`}<button class="s" onclick="S.tip=null;render()">Fechar</button></div></div>`};
+const tipH=()=>{if(!S.tip)return'';const{k,i}=S.tip,o=k=='j'?S.jokers[i]:S.cons[i];if(!o)return'';return`<div class="tip pn"><div style="float:left;width:46px;margin-right:10px">${tar(k=='c'?T.indexOf(o):9+J.indexOf(o))}</div><b>${o.n}</b><div style="color:var(--m);font-weight:400;margin:4px 0 8px">${o.d}</div><div class="row" style="clear:both">${k=='j'?`<button class="o" style="flex:1" onclick="sj(${i})">Vender $${o.p>>1}</button>`:`<button style="flex:1" onclick="use(${i})">Usar</button>`}<button class="s" onclick="S.tip=null;render()">Fechar</button></div></div>`};
 const tp=()=>`<div class="pn st"><span>Ante <b style="font-size:18px">${S.ante}</b>/8</span><b style="color:var(--g);font-size:22px">$${S.money}</b><span><button class="s" onclick="info()">Níveis</button><button class="s" onclick="MUTE^=1;render()">${MUTE?'🔇':'🔊'}</button></span></div>`;
 const itm=(it,i)=>{if(!it)return`<div class="pn" style="opacity:.4;text-align:center">Vendido</div>`;const x=inf(it);return`<button class="it" onclick="buy(${i})"><i>${ico(it)}</i><span style="flex:1"><b>${x.n}</b><small>${x.d}</small></span><b style="color:var(--g);font-size:18px">$${pr(x.p||3)}</b></button>`};
 const BC=['var(--b)','var(--o)','var(--r)'];
 const scr={
-menu:()=>`<h1>${[...'CORINGA'].map(c=>`<span>${c}</span>`).join('')}</h1><div class="msg">Escolha seu baralho</div>${DK.map((d,i)=>`<button class="it" onclick="newRun(${i})"><i>${['🟥','🟦','⬛','👻'][i]}</i><span><b>${d[0]}</b><small>${d[1]}</small></span></button>`).join('')}`,
+menu:()=>`<div class="gd" style="width:84px;margin:14px auto 0">${GOD}</div><h1 style="margin-top:6px">${[...'CORINGA'].map(c=>`<span>${c}</span>`).join('')}</h1><div class="msg">${CF.runs?`Melhor mão ${N(CF.bh)} · Ante ${CF.ba}/8 · Vitórias ${CF.wins}`:'Sua jornada começa aqui'}</div><button class="it" onclick="S={scr:'decks'};render()"><i>▶️</i><span><b>Jogar</b><small>Escolha um baralho e comece</small></span></button><button class="it" onclick="tutStart()"><i>📖</i><span><b>Tutorial</b><small>Arcanus ensina tudo${CF.td?'':' ★ novo'}</small></span></button><button class="it" onclick="S={scr:'opts'};render()"><i>⚙️</i><span><b>Opções</b><small>Volume, vibração e recordes</small></span></button>`,
+decks:()=>`<h2 style="margin-top:20px">Escolha seu baralho</h2>${DK.map((d,i)=>`<button class="it" onclick="newRun(${i})"><i>${['🟥','🟦','⬛','👻'][i]}</i><span><b>${d[0]}</b><small>${d[1]}</small></span></button>`).join('')}<button class="s" onclick="S={scr:'menu'};render()">Voltar</button>`,
+opts:()=>`<h2 style="margin-top:20px">Opções</h2><div class="pn">Música<input type="range" min="0" max="100" value="${Math.round(CF.mv*100)}" oninput="setV('mv',this.value/100)">Efeitos<input type="range" min="0" max="100" value="${Math.round(CF.sv*100)}" oninput="setV('sv',this.value/100)" onchange="snd(SF.buy)"><button class="s" onclick="MUTE^=1;render()">Som: ${MUTE?'DESLIGADO':'LIGADO'}</button><button class="s" onclick="CF.vib^=1;svc();vib(60);render()">Vibração: ${CF.vib?'LIGADA':'DESLIGADA'}</button></div><div class="pn msg">Melhor mão ${N(CF.bh)} · Ante ${CF.ba}/8 · Vitórias ${CF.wins}/${CF.runs}</div><button class="o" onclick="if(confirm('Apagar recordes?')){CF.runs=CF.wins=CF.bh=CF.ba=0;svc();render()}">Apagar recordes</button><button onclick="S={scr:'menu'};render()">Voltar</button>`,
 blind:()=>{S.boss=S.bosses[S.ante]??=rnd(B);return`${tp()}<div class="msg">${S.msg}</div>${[0,1,2].map(i=>`<div class="pn" style="border-left:10px solid ${BC[i]};${i==S.st?'':'opacity:.4'}"><div class="st"><b style="font-size:16px">${i==2?S.boss.n:BL[i]}</b><span>Meta <b style="color:var(--r)">${N([300,800,2000,5000,11000,20000,35000,50000][S.ante-1]*[1,1.5,2][i]*(i==2&&S.boss.id=='muro'?2:1))}</b> · <b style="color:var(--g)">+$${[3,4,5][i]}</b></span></div>${i==2?`<div class="rd">${S.boss.d}</div>`:''}</div>`).join('')}<button class="y" onclick="go()">Jogar blind</button>${jr()}`},
 round:()=>{const P=S.pl,pc=P?P.pc:S.hand.filter(c=>S.sel.has(c.id));let hn='&nbsp;',ch='',mu='';
 if(pc.length){const h=P?P.h:ev(pc).h,L=S.lv[h]-1,H=HD[h];hn=`${H[0]} Nv.${L+1}`;ch=P?P.ch:H[1]+L*H[3];mu=P?P.mu:H[2]+L*H[4]}
 const t=tgt();return`${tp()}
 <div class="pn" style="border-left:10px solid ${BC[S.st]}"><div class="st"><b style="font-size:16px">${bs()?S.boss.n:BL[S.st]}</b><span>Meta <b style="color:var(--r);font-size:18px">${N(t)}</b></span></div>${bs()?`<div class="rd">${S.boss.d}</div>`:''}<div class="bar" style="margin:6px 0"><i style="width:${Math.min(100,S.score/t*100)}%"></i></div><div class="st"><span>Pontos</span><b id="sv" style="font-size:18px">${N(S.score)}</b></div></div>
 ${jr()}
-<div class="pn" style="text-align:center;min-height:136px"><div>${hn}</div><div class="sc"><span class="ch">${ch}</span>×<span class="mu">${mu}</span></div>${P&&P.tot?`<div class="tot">= ${N(P.tot)}</div>`:''}<div class="hand" style="padding-top:8px">${P?P.pc.map(c=>cd(c,P.hi==c.id?'hi':'').replace(/onclick="[^"]*"/,'')).join(''):''}</div></div>
+<div class="pn" style="text-align:center;min-height:136px"><div>${hn}</div><div class="sc"><span class="ch">${ch}</span>×<span class="mu">${mu}</span></div>${P&&P.tot?`<div class="tot">= ${N(P.tot)}</div>`:!P&&pc.length?`<div class="msg" style="font-size:13px">≈ ${N(estp(pc))} pontos</div>`:''}<div class="hand" style="padding-top:8px">${P?P.pc.map(c=>cd(c,P.hi==c.id?'hi':'').replace(/onclick="[^"]*"/,'')).join(''):''}</div></div>
 <div class="msg">${S.msg}</div><div class="hand" id="hd">${S.hand.map(c=>cd(c,S.sel.has(c.id)?'sel':'')).join('')}</div>
 <div class="row"><button style="flex:1" onclick="play()" ${S.sel.size&&S.hl&&!busy?'':'disabled'}>Jogar (${S.hl})</button><button class="o" style="flex:1" onclick="disc()" ${S.sel.size&&S.dl&&!busy?'':'disabled'}>Descartar (${S.dl})</button></div>
 <div class="st"><span><button class="s" onclick="srtBy('r')">Valor</button><button class="s" onclick="srtBy('s')">Naipe</button></span><span><i class="bk"></i>${S.draw.length}/${S.cards.length}</span></div>`},
 shop:()=>`${tp()}<h2>Loja</h2><div class="msg">${S.rep}${S.msg?'<br>'+S.msg:''}</div>${S.sp.l.map(itm).join('')}<div class="row"><button class="s" style="flex:1" onclick="reroll()">Reroll $${S.sp.rr}</button><button class="y" style="flex:2" onclick="S.scr='blind';render()">Próxima blind</button></div>${jr()}
 ${S.pack?`<div class="ov"><h2>Escolha 1</h2>${S.pack.map((it,i)=>{const x=inf(it);return`<button class="it" onclick="pick(${i})"><i>${ico(it)}</i><span><b>${x.n}</b><small>${x.d}</small></span></button>`}).join('')}<div class="msg">${S.msg}</div><button class="s" onclick="pick(-1)">Pular</button></div>`:''}`,
-over:()=>`<h1><span>FIM</span></h1><div class="pn msg">Você caiu no Ante ${S.ante} (${BL[S.st]}) com ${N(S.score)} de ${N(tgt())} pontos.</div><button class="o" onclick="S={scr:'menu'};render()">Jogar de novo</button>`,
-won:()=>`<h1><span>VITÓRIA!</span></h1><div class="pn msg">Você venceu os 8 antes com ${S.jokers.length} coringas.</div><button class="y" onclick="S={scr:'menu'};render()">Jogar de novo</button>`};
+over:()=>`<h1><span>FIM</span></h1><div class="pn msg">Você caiu no Ante ${S.ante} (${BL[S.st]}) com ${N(S.score)} de ${N(tgt())} pontos.</div>${rsum()}<button class="o" onclick="S={scr:'decks'};render()">Jogar de novo</button><button class="s" onclick="S={scr:'menu'};render()">Menu</button>`,
+won:()=>`<h1><span>VITÓRIA!</span></h1><div class="pn msg">Você venceu os 8 antes!</div>${rsum()}<button class="y" onclick="S={scr:'decks'};render()">Jogar de novo</button><button class="s" onclick="S={scr:'menu'};render()">Menu</button>`};
 const PAL={danger:['#b01030','#4a0618','#0a0004'],hype:['#f5b244','#e0405a','#2a1033'],menu:['#e0405a','#2f63e0','#1d1033'],round:['#1f9a63','#1a5a8a','#0b2a2a'],boss:['#8a2fd0','#e0203c','#160a24'],shop:['#e07a2a','#8a3fb0','#2a1033'],over:['#666','#333','#000'],won:['#f5b244','#e0405a','#2a1033']};
 let U;
 function tint(k){if(!U)return;(PAL[k]||PAL.menu).forEach((h,i)=>{const c=new THREE.Color(h),v=U['c'+(i+1)].value;window.gsap?gsap.to(v,{r:c.r,g:c.g,b:c.b,duration:1}):v.copy(c)})}
@@ -214,7 +228,7 @@ float v=sin(p.x*1.3+p.y)*.5+.5,w=sin(length(p)*2.+t*.3)*.5+.5;
 vec3 c=mix(c3,c1,smoothstep(.25,.6,v));c=mix(c,c2,smoothstep(.45,.8,w)*.85);c*=.8+.2*step(.08,fract(v*4.));c+=k*.16+step(.997,fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233))+floor(t*1.5))*43758.5453))*.4;c=floor(c*7.+.5)/7.;gl_FragColor=vec4(c,1.);}`}));
 m.frustumCulled=false;sc.add(m);const rs=()=>{R.setSize(innerWidth,innerHeight,false);U.r.value.set(cv.width,cv.height)};rs();addEventListener('resize',rs);
 let pt=0;const lp=t=>{U.t.value+=(t-pt)/1000*U.sp.value;pt=t;R.render(sc,cm);requestAnimationFrame(lp)};lp(0)}
-function render(){const nsc=S.last!=S.scr;if(nsc)S.tip=null;S.last=S.scr;$a.innerHTML=scr[S.scr]()+tipH();moodUp(nsc);if(!window.gsap)return;
+function render(){const nsc=S.last!=S.scr;if(nsc)S.tip=null;S.last=S.scr;$a.innerHTML=scr[S.scr]()+tipH()+tutH();moodUp(nsc);tuHL();if(!window.gsap)return;
 if(nsc){gsap.from('#app>*',{y:26,opacity:0,duration:.35,stagger:.05,ease:'back.out(2)'});
 if(S.scr=='round'&&bs())gsap.fromTo('#app',{x:-14},{x:0,duration:.9,delay:.35,ease:'elastic.out(1,.25)'});if(S.scr=='menu')gsap.to('h1 span',{y:-8,repeat:-1,yoyo:true,stagger:.1,duration:.6,ease:'sine.inOut'})}
 if(S.nw&&S.nw.length){const e=[...document.querySelectorAll('#hd .cd')].filter(x=>S.nw.includes(+x.dataset.id));e.length&&gsap.from(e,{y:280,rotation:()=>gsap.utils.random(-30,30),opacity:0,duration:.5,stagger:.05,ease:'back.out(1.4)'});e.length&&snd(SF.dl);S.nw=[]}
@@ -227,7 +241,7 @@ const SF={se:[[520,.07,'square',.07,780]],de:[[520,.07,'square',.06,330]],ck:[[4
 jk:[[700,.08,'square',.08],[1050,.14,'square',.08,0,.08]],tot:[[523,.1],[659,.1,'square',.08,0,.1],[784,.1,'square',.08,0,.2],[1047,.35,'square',.09,0,.3]],
 win:[[523,.12],[659,.12,'square',.08,0,.12],[784,.12,'square',.08,0,.24],[1047,.12,'square',.08,0,.36],[784,.1,'square',.08,0,.48],[1047,.4,'square',.09,0,.58]],
 lose:[[400,.25,'sawtooth',.09,120],[300,.25,'sawtooth',.09,80,.25],[200,.5,'sawtooth',.09,50,.5]],buy:[[988,.07],[1319,.22,'square',.07,0,.07]]};
-function snd(a){if(MUTE)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();const t=AC.currentTime;a.forEach(([f,d,w,v,e,dl])=>{const o=AC.createOscillator(),g=AC.createGain(),b=t+(dl||0);o.type=w||'square';o.frequency.setValueAtTime(f,b);e&&o.frequency.exponentialRampToValueAtTime(e,b+d);g.gain.setValueAtTime(v||.08,b);g.gain.exponentialRampToValueAtTime(.001,b+d);o.connect(g);g.connect(AC.destination);o.start(b);o.stop(b+d+.02)})}catch(x){}}
+function snd(a){vibS(a);if(MUTE)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();const t=AC.currentTime;a.forEach(([f,d,w,v,e,dl])=>{const o=AC.createOscillator(),g=AC.createGain(),b=t+(dl||0);o.type=w||'square';o.frequency.setValueAtTime(f,b);e&&o.frequency.exponentialRampToValueAtTime(e,b+d);g.gain.setValueAtTime(v||.08,b);g.gain.exponentialRampToValueAtTime(.001,b+d);o.connect(g);g.connect(SGN());o.start(b);o.stop(b+d+.02)})}catch(x){}}
 document.addEventListener('click',e=>{mus();if(e.target.closest&&e.target.closest('button'))snd(SF.ck)});
 
 const MU={mood:'',step:0,next:0,g:null,nb:null};
@@ -239,7 +253,7 @@ hype:{bpm:150,b:[48,Z,48,55,Z,48,55,Z,53,Z,53,60,Z,53,60,Z],l:[72,76,79,76,72,76
 boss:{bpm:138,b:[40,40,Z,40,41,Z,40,Z,40,40,Z,46,Z,45,Z,41],l:[64,Z,Z,65,Z,Z,70,Z,64,Z,Z,65,Z,63,Z,58],w:'sawtooth',lv:.035,h:1,sn:1},
 danger:{bpm:172,b:[33,33,Z,33,33,Z,33,34,33,33,Z,33,34,Z,33,32],l:[81,80,81,80,81,80,81,80,76,75,76,75,76,75,76,75],w:'square',lv:.045,h:2,sn:1,hb:1},
 over:{bpm:56,b:[33,Z,Z,Z,Z,Z,Z,Z,31,Z,Z,Z,Z,Z,Z,Z],l:[Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z,Z],w:'triangle',lv:.05,h:0}};
-function mus(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();if(!MU.g){MU.g=AC.createGain();MU.g.gain.value=.32;MU.g.connect(AC.destination);MU.nb=AC.createBuffer(1,AC.sampleRate>>2,AC.sampleRate);const d=MU.nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;MU.next=AC.currentTime+.1;setInterval(mtick,40)}}catch(e){}}
+function mus(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();if(!MU.g){MU.g=AC.createGain();MU.g.gain.value=.32*CF.mv;MU.g.connect(AC.destination);MU.nb=AC.createBuffer(1,AC.sampleRate>>2,AC.sampleRate);const d=MU.nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;MU.next=AC.currentTime+.1;setInterval(mtick,40)}}catch(e){}}
 function mn(f,t,d,w,v){const o=AC.createOscillator(),g=AC.createGain();o.type=w;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(MU.g);o.start(t);o.stop(t+d+.02)}
 function nz(t,d,v,hp){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=MU.nb;f.type='highpass';f.frequency.value=hp;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(f);f.connect(g);g.connect(MU.g);s.start(t);s.stop(t+d+.02)}
 function kk(t,v){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(g);g.connect(MU.g);o.start(t);o.stop(t+.18)}
@@ -258,9 +272,57 @@ if(U&&S.tkl!=k){S.tkl=k;tint(k)}
 if(m!=MU.mood){const old=MU.mood;MU.mood=m;MU.step=0;if(AC)MU.next=AC.currentTime+.05;
 if(U&&window.gsap)gsap.to(U.sp,{value:{danger:2.4,hype:1.6,boss:1.4,over:.25}[m]||1,duration:1.2});
 if(S.scr=='round'&&old=='play'||old=='hype'||old=='boss'){}
-if(m=='danger'){snd([[180,.7,'sawtooth',.08,900]]);setTimeout(()=>pop('#hd','⚠ PERIGO!','#ff4c40',-34),120)}
+if(m=='danger'){vib([80,60,80]);snd([[180,.7,'sawtooth',.08,900]]);setTimeout(()=>pop('#hd','⚠ PERIGO!','#ff4c40',-34),120)}
 else if(m=='hype'&&S.scr=='round'&&old!='danger'){snd(SF.tot);setTimeout(()=>pop('#hd','QUASE LÁ!','#f5b244',-34),120)}}
 if(nsc&&S.scr=='over'&&window.gsap)gsap.fromTo('#app',{x:-22},{x:0,duration:1,ease:'elastic.out(1,.2)'})}
+
+let CF={mv:.7,sv:1,vib:1,runs:0,wins:0,bh:0,ba:0,td:0};try{Object.assign(CF,JSON.parse(localStorage.cf))}catch(e){}
+const svc=()=>{try{localStorage.cf=JSON.stringify(CF)}catch(e){}};
+let SG;const SGN=()=>{if(!SG){SG=AC.createGain();SG.gain.value=CF.sv;SG.connect(AC.destination)}return SG};
+const vib=p=>{try{CF.vib&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+function vibS(a){if(a==SF.pl)vib(15);else if(a==SF.tot)vib(45);else if(a==SF.win)vib([60,40,120]);else if(a==SF.lose)vib(350);else if(a==SF.buy)vib([15,30,15]);else if(a==SF.se||a==SF.de)vib(6);else if(a==SF.dc)vib(22)}
+function setV(k,v){CF[k]=+v;svc();if(k=='mv'&&MU.g)MU.g.gain.value=.32*CF.mv;if(k=='sv'&&SG)SG.gain.value=CF.sv}
+function endRun(w){CF.runs++;CF.wins+=w;CF.bh=Math.max(CF.bh,S.rs.best);CF.ba=Math.max(CF.ba,S.ante);svc()}
+function coins(n){if(!window.gsap)return;for(let i=0;i<n;i++){const d=document.createElement('div');d.textContent='🪙';d.style.cssText=`position:fixed;z-index:6;top:-40px;left:${Math.random()*100}%;font-size:${18+Math.random()*14}px;pointer-events:none`;document.body.appendChild(d);gsap.to(d,{y:innerHeight+80,rotationY:720,duration:gsap.utils.random(1,1.8),delay:Math.random()*.5,ease:'power1.in',onComplete:()=>d.remove()})}}
+function estp(pc){const{h,sc}=ev(pc),L=S.lv[h]-1,H=HD[h];let ch=H[1]+L*H[3],mu=H[2]+L*H[4];S.hl--;try{
+for(const c of sc){if(deb(c))continue;ch+=(c.r>10?c.r==14?11:10:c.r)+(c.ch||0);mu+=c.mu||0;for(const j of S.jokers){const e=j.k&&j.k(c);if(e){ch+=e.c||0;mu+=e.m||0;mu*=e.x||1}}}
+for(const j of S.jokers){const e=j.h&&j.h({h,pc,sc});if(e){ch+=e.c||0;mu+=e.m||0;mu*=e.x||1}}}finally{S.hl++}return Math.round(ch*mu)}
+const rsum=()=>{const r=S.rs;return`<div class="pn">${[['Antes alcançados',S.ante+'/8'],['Mãos jogadas',r.n],['Descartes usados',r.d],['Melhor mão',r.bn?r.bn+' · '+N(r.best):'-'],['Dinheiro','$'+S.money],['Coringas',S.jokers.map(j=>EM[J.indexOf(j)]).join(' ')||'-']].map(([a,b])=>`<div class="st" style="padding:3px 0"><span>${a}</span><b>${b}</b></div>`).join('')}</div>`};
+// ---- deus pixel art ----
+const GP=['...y...gg...y...','..y..gggggg..y..','.....gyyyyg.....','...gyyddddyyg...','..gydssssssdyg..','..gdsbssssbsdg..','..gdssssssssdg..','.y.dsvvvvvvsd.y.','...dvvvvvvvvd...','...dpvvvvvvpd...','..dpppvvvvpppd..','.dppqpprrppqppd.','.dppqppppppqppd.','dpppqppyyppqpppd','dppppppyyppppppd','.dppppppppppppd.','..dddddddddddd..','..y...y..y...y..'];
+const GC={y:'#ffe27a',g:'#f5b244',d:'#2a1650',s:'#ffe0b8',b:'#6ad0ff',v:'#f4f4ff',p:'#7a3fd0',q:'#b48af5',r:'#ff4c40'};
+const GOD=`<svg viewBox="0 0 16 18" shape-rendering="crispEdges">${GP.map((row,y)=>[...row].map((c,x)=>c=='.'?'':`<rect x="${x}" y="${y}" width="1" height="1" fill="${GC[c]}"/>`).join('')).join('')}</svg>`;
+// ---- tutorial ----
+const tpk=l=>{S.sel=new Set(l.map(([r,s])=>S.cards.find(c=>c.r==r&&c.s==s).id));snd(SF.se);render()};
+function tgo(){go();const cc=(r,s)=>S.cards.find(c=>c.r==r&&c.s==s);S.hand=[cc(13,0),cc(13,1),cc(7,2),cc(7,3),cc(5,0),cc(3,1),cc(10,2),cc(14,3)];S.draw=sh(S.cards.filter(c=>!S.hand.includes(c)));S.nw=[];srt();render()}
+const TUT=[
+{x:'Salve, viajante! Sou Arcanus, guardião das cartas. Vou te ensinar tudo sobre o Coringa!'},
+{x:'Primeiro, o baralho: são 52 cartas. Cada baralho muda as regras: Vermelho (+1 descarte), Azul (+1 mão), Preto (+1 coringa, −1 mão) e Abandonado (sem J, Q, K).'},
+{x:'O jogo tem 8 Antes. Cada Ante tem 3 blinds: Pequena, Grande e Boss. Alcance a meta de pontos de cada uma para avançar.',h:'#app>.pn:nth-child(3),#app>.pn:nth-child(4)'},
+{x:'O Boss tem uma regra maligna, como um naipe que não pontua ou só 1 mão. Leia antes de jogar!',h:'#app>.pn:nth-child(5)'},
+{x:'Vamos jogar uma blind de teste. Siga comigo!',a:async()=>{tgo();await sl(300)}},
+{x:'No topo ficam seu dinheiro e o Ante. Abaixo, a meta da blind e a barra de progresso. Encha a barra para vencer!',h:'#app>.pn:nth-child(2)'},
+{x:'Esta é sua mão. Toque nas cartas para selecionar até 5. Selecionei dois Reis para você.',h:'#hd',a:async()=>{tpk([[13,0],[13,1]]);await sl(600)}},
+{x:'Dois Reis formam um Par! O painel mostra Fichas × Mult e a prévia dos pontos. Pontos = Fichas × Mult.',h:'#app>.pn:nth-child(6)'},
+{x:'Combinações, da mais fraca à mais forte: Carta Alta, Par, Dois Pares, Trinca, Sequência, Flush, Full House, Quadra e Straight Flush.'},
+{x:'Cada mão tem um nível. Toque em Níveis para ver. Planetas na loja sobem o nível e aumentam o valor da mão.',h:'#app>.pn.st:nth-child(1) button'},
+{x:'Cartas valem fichas: 2 a 10 pelo número, figuras 10 e Ás 11. Só as cartas que formam a combinação pontuam.'},
+{x:'Aqui ficam seus Coringas. Eles dão bônus! Este dá +4 de Mult. Toque num coringa para ver o efeito ou vendê-lo.',h:'#app>.row:nth-child(4)'},
+{x:'Pontuou! Cada carta e cada coringa somou. Quando os pontos chegam na meta, você vence. Você tem um número limitado de mãos (botão Jogar).',h:'#app>.row:nth-child(9)',a:async()=>{await play();await sl(400)}},
+{x:'Descartei três cartas fracas e comprei novas. Descartes também são limitados, use bem!',h:'#app>.row:nth-child(9)',a:async()=>{tpk([[5,0],[3,1],[10,2]]);await sl(600);await disc();await sl(400)}},
+{x:'Você pode ordenar a mão por Valor ou por Naipe. Isso ajuda a enxergar sequências e flushes.',h:'#app>.st:nth-child(10)'},
+{x:'Usei O Mundo: duas cartas viraram ♠! Tarôs mudam suas cartas. Outros dão bônus permanentes ou destroem cartas fracas.',h:'#app>.row.cons',a:async()=>{tpk([[7,2],[7,3]]);await sl(600);use(0);await sl(1500)}},
+{x:'Vencemos! Você ganha a recompensa, juros ($1 a cada $5 guardados) e $1 por mão que sobrou. E esta é a Loja!',a:async()=>{S.score=tgt();await sl(200);win();await sl(1200)}},
+{x:'Na loja você compra Coringas, Tarôs, Planetas (sobem o nível de uma mão), Vouchers (melhorias permanentes) e Pacotes.',h:'#app>button.it'},
+{x:'Pacotes deixam você escolher 1 de 3 itens. O Reroll troca os itens por dinheiro, e o preço sobe a cada uso.',h:'#app>.row:nth-child(9)'},
+{x:'Cuidado com os slots: há limite de coringas e de tarôs. Venda coringas fracos tocando neles.'},
+{x:'Repare: quando a situação aperta, a música e o fundo ficam tensos e vermelhos. Perto da meta, ficam dourados!'},
+{x:'Vença os 8 Antes para conquistar o jogo. Ajuste volume e vibração em Opções. Boa sorte, viajante!'}];
+function tutStart(){newRun(0);S.tut=1;S.cons=[T[0]];S.jokers=[J[0]];render()}
+function tEnd(){CF.td=1;svc();S={scr:'menu'};render()}
+async function tNext(){if(S.tbusy)return;if(++S.tut>TUT.length)return tEnd();const st=TUT[S.tut-1];if(st.a){S.tbusy=1;S.th=1;render();try{await st.a()}catch(e){}S.th=0;S.tbusy=0}render()}
+const tutH=()=>{if(!S.tut)return'';const st=TUT[S.tut-1];return'<div class="tb"></div>'+(S.th?'':`<div class="tv pn"><div class="gd">${GOD}</div><div style="flex:1"><b style="color:var(--g)">Arcanus</b> <small style="color:var(--m)">${S.tut}/${TUT.length}</small><div class="tt">${st.x}</div><div class="row"><button class="s" onclick="tEnd()">Pular</button><button style="flex:1" onclick="tNext()">Próximo ▶</button></div></div></div>`)};
+function tuHL(){if(!S.tut)return;const st=TUT[S.tut-1];if(st.h&&!S.th)document.querySelectorAll(st.h).forEach(e=>e.classList.add('tuh'));if(window.gsap&&!S.th&&S.tl!=S.tut){S.tl=S.tut;gsap.from('.tv',{y:60,opacity:0,duration:.35,ease:'back.out(2)'})}}
 function kick(v){if(U&&window.gsap)gsap.fromTo(U.k,{value:v},{value:0,duration:.9,ease:'power2.out'})}
 function spark(sel,col,n=10){if(!window.gsap)return;const e=document.querySelector(sel);if(!e)return;const r=e.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;for(let i=0;i<n;i++){const d=document.createElement('div');d.style.cssText=`position:fixed;z-index:6;left:${cx}px;top:${cy}px;width:7px;height:7px;background:${col};pointer-events:none;box-shadow:0 0 0 2px #0f171a`;document.body.appendChild(d);const a=Math.random()*6.28,l=30+Math.random()*50;gsap.to(d,{x:Math.cos(a)*l,y:Math.sin(a)*l,rotation:gsap.utils.random(-180,180),opacity:0,duration:.6,ease:'power2.out',onComplete:()=>d.remove()})}}
 function confetti(){if(!window.gsap)return;for(let i=0;i<36;i++){const d=document.createElement('div');d.textContent=SU[i%4];d.style.cssText=`position:fixed;z-index:6;top:-40px;left:${Math.random()*100}%;font-size:${20+Math.random()*20}px;color:${['#ff4c40','#f5b244','#0093ff','#35bd86'][i%4]};-webkit-text-stroke:2px #0f171a;pointer-events:none`;document.body.appendChild(d);gsap.to(d,{y:innerHeight+80,x:gsap.utils.random(-80,80),rotation:gsap.utils.random(-360,360),duration:gsap.utils.random(1.2,2.2),delay:Math.random()*.4,ease:'power1.in',onComplete:()=>d.remove()})}}
