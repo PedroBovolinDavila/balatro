@@ -84,7 +84,22 @@ const J=[
 {n:'Rosto Alegre',d:'Figuras pontuando: +5 Mult',p:5,k:c=>c.r>10&&c.r<14&&{m:5}},
 {n:'Último Suspiro',d:'Na última mão: X3 Mult',p:8,h:()=>S.hl==0&&{x:3}},
 {n:'Coroa',d:'X1.5 Mult sempre',p:8,h:()=>({x:1.5})},
-{n:'Cofrinho',d:'+$3 ao fim da rodada',p:6,g:3}];
+{n:'Cofrinho',d:'+$3 ao fim da rodada',p:6,g:3},
+{n:'Sortudo',d:'7 pontuando: +7 Mult',p:4,k:c=>c.r==7&&{m:7}},
+{n:'Ás de Ouro',d:'Ases pontuando: +20 Fichas e +4 Mult',p:5,k:c=>c.r==14&&{c:20,m:4}},
+{n:'Duplo Ataque',d:'Dois Pares: +12 Mult',p:4,h:x=>x.h==2&&{m:12}},
+{n:'Maratonista',d:'Sequência: X3 Mult',p:8,h:x=>has([4,8])(x)&&{x:3}},
+{n:'Rei do Flush',d:'Flush: X2 Mult',p:7,h:x=>has([5,8])(x)&&{x:2}},
+{n:'Casa Cheia',d:'Full House: X3 Mult',p:7,h:x=>x.h==6&&{x:3}},
+{n:'Solitário',d:'Carta Alta: +20 Mult',p:3,h:x=>x.h==0&&{m:20}},
+{n:'Minimalista',d:'Com 3 cartas ou menos: +12 Mult',p:4,h:x=>x.pc.length<4&&{m:12}},
+{n:'Punhado',d:'Com 5 cartas: +50 Fichas',p:4,h:x=>x.pc.length==5&&{c:50}},
+{n:'Reserva',d:'+2 Mult por descarte restante',p:5,h:()=>({m:2*S.dl})},
+{n:'Mineiro',d:'+$4 ao fim da rodada',p:7,g:4},
+{n:'Rainha Má',d:'Damas pontuando: +10 Mult',p:5,k:c=>c.r==12&&{m:10}},
+{n:'Espadachim',d:'♠ e ♣ pontuando: +30 Fichas',p:4,k:c=>(c.s==0||c.s==3)&&{c:30}},
+{n:'Vermelhão',d:'♥ e ♦ pontuando: X1.2 Mult',p:6,k:c=>(c.s==1||c.s==2)&&{x:1.2}},
+{n:'Quadrado',d:'Quadra: X4 Mult',p:7,h:x=>x.h==7&&{x:4}}];
 const dst=(cs)=>S.hand=S.hand.filter(c=>!cs.includes(c));
 const T=[
 {n:'O Mundo',d:'Até 3 cartas viram ♠',k:3,f:cs=>cs.map(c=>c.s=0)},
@@ -96,6 +111,13 @@ const T=[
 {n:'A Imperatriz',d:'Até 2 cartas ganham +4 Mult',k:2,f:cs=>cs.map(c=>c.mu=(c.mu||0)+4)},
 {n:'O Hierofante',d:'Até 2 cartas ganham +30 Fichas',k:2,f:cs=>cs.map(c=>c.ch=(c.ch||0)+30)},
 {n:'O Eremita',d:'Dobra seu dinheiro (máx +$20)',k:0,f:()=>S.money+=Math.min(S.money,20)}];
+T.push(
+{n:'O Imperador',d:'Até 2 cartas viram Ás',k:2,f:cs=>cs.map(c=>c.r=14)},
+{n:'A Justiça',d:'1 carta ganha +50 Fichas e +8 Mult',k:1,f:cs=>cs.map(c=>{c.ch=(c.ch||0)+50;c.mu=(c.mu||0)+8})},
+{n:'Os Enamorados',d:'Até 2 cartas: +3 Mult e +15 Fichas',k:2,f:cs=>cs.map(c=>{c.mu=(c.mu||0)+3;c.ch=(c.ch||0)+15})},
+{n:'A Temperança',d:'Ganha o valor de venda dos coringas (máx $25)',k:0,f:()=>S.money+=Math.min(25,S.jokers.reduce((a,j)=>a+(j.p>>1),0))},
+{n:'A Roda da Fortuna',d:'50% de chance de ganhar $15',k:0,f:()=>{if(Math.random()<.5){S.money+=15;fl('Sorte! +$15')}else fl('A roda não girou a seu favor')}},
+{n:'O Mago',d:'+2 descartes nesta rodada',k:0,rd:1,f:()=>{S.dl+=2}});
 T.forEach(t=>t.p=t.n=='O Eremita'?4:3);
 const V=[
 {n:'Mãos Extras',d:'+1 mão por rodada',p:10,f:()=>S.hands++},
@@ -108,12 +130,13 @@ const V=[
 const PK=[{n:'Pacote de Coringas',d:'Escolha 1 de 3 coringas',p:6,kind:'j'},{n:'Pacote Planetário',d:'Escolha 1 de 3 planetas',p:4,kind:'p'},{n:'Pacote Arcano',d:'Escolha 1 de 3 tarôs',p:4,kind:'t'}];
 const DK=[['Vermelho','+1 descarte',()=>S.discards++],['Azul','+1 mão',()=>S.hands++],['Preto','+1 slot de coringa, −1 mão',()=>{S.js++;S.hands--}],['Abandonado','Sem figuras (J, Q, K)',()=>S.cards=S.cards.filter(c=>c.r<11||c.r==14)]];
 const B=[{id:'gancho',n:'O Gancho',d:'Descarta 2 cartas aleatórias após cada mão'},{id:'agulha',n:'A Agulha',d:'Apenas 1 mão'},{id:'agua',n:'A Água',d:'Começa sem descartes'},{id:'dente',n:'O Dente',d:'Perde $1 por mão jogada'},{id:'muro',n:'O Muro',d:'Meta 2x maior'},
+{id:'pilar',n:'O Pilar',d:'J, Q e K não pontuam'},{id:'baixo',n:'O Baixo',d:'Cartas de 2 a 6 não pontuam'},{id:'ladrao',n:'O Ladrão',d:'Perde $2 por mão jogada'},{id:'relogio',n:'O Relógio',d:'Apenas 2 mãos, meta 40% menor'},{id:'curta',n:'A Mão Curta',d:'Compra 2 cartas a menos'},{id:'veneno',n:'O Veneno',d:'Cada descarte custa $1'},
 {id:'d0',s:0,n:'O Ferro',d:'Cartas ♠ não pontuam'},{id:'d1',s:1,n:'A Cabeça',d:'Cartas ♥ não pontuam'},{id:'d2',s:2,n:'A Janela',d:'Cartas ♦ não pontuam'},{id:'d3',s:3,n:'O Clube',d:'Cartas ♣ não pontuam'}];
 const BL=['Blind Pequena','Blind Grande','Boss Blind'];
 let S={scr:'menu'},busy=0;
 const $a=document.getElementById('app'),pr=p=>Math.ceil(p*S.disc),bs=()=>S.st==2,bid=()=>bs()&&S.boss.id;
-const tgt=()=>[300,800,2000,5000,11000,20000,35000,50000][S.ante-1]*[1,1.5,2][S.st]*(bid()=='muro'?2:1);
-const deb=c=>bs()&&S.boss.s!==undefined&&c.s==S.boss.s;
+const tgt=()=>[300,800,2000,5000,11000,20000,35000,50000][S.ante-1]*[1,1.5,2][S.st]*({muro:2,relogio:.6}[bid()]||1);
+const deb=c=>bs()&&(S.boss.s!==undefined&&c.s==S.boss.s||bid()=='pilar'&&c.r>10&&c.r<14||bid()=='baixo'&&c.r<7);
 function ev(cs){const n=cs.length,cnt={};cs.forEach(c=>cnt[c.r]=(cnt[c.r]||0)+1);
 const g=Object.values(cnt).sort((a,b)=>b-a),fl=n==5&&cs.every(c=>c.s==cs[0].s),rs=[...new Set(cs.map(c=>c.r))].sort((a,b)=>a-b),
 st=n==5&&rs.length==5&&(rs[4]-rs[0]==4||rs.join()=='2,3,4,5,14'),a=g[0],b=g[1]||0;
@@ -122,11 +145,11 @@ const sc=[4,5,6,8].includes(h)?cs:h==0?[cs.reduce((x,y)=>y.r>x.r?y:x)]:cs.filter
 function newRun(i){S={scr:'blind',ante:1,st:0,money:4,hands:4,discards:3,hs:8,js:5,cs:2,jokers:[],cons:[rnd(T)],lv:Array(9).fill(1),vo:[],bosses:{},sel:new Set(),ic:5,disc:1,sort:'r',cards:[],msg:'',rs:{n:0,best:0,bn:'',d:0}};
 let id=0;for(let s=0;s<4;s++)for(let r=2;r<15;r++)S.cards.push({id:id++,r,s});DK[i][2]();render()}
 const srt=()=>S.hand.sort(S.sort=='r'?(a,b)=>b.r-a.r||a.s-b.s:(a,b)=>a.s-b.s||b.r-a.r);
-const fill=()=>{while(S.hand.length<S.hs&&S.draw.length){const c=S.draw.pop();S.hand.push(c);(S.nw=S.nw||[]).push(c.id)}srt()};
-function go(){S.draw=sh(S.cards.slice());S.hand=[];S.nw=[];S.pp=0;S.ps=0;S.sel.clear();S.score=0;S.hl=S.hands;S.dl=S.discards;if(bid()=='agulha')S.hl=1;if(bid()=='agua')S.dl=0;fill();S.scr='round';render()}
+const fill=()=>{while(S.hand.length<S.hs-(bid()=='curta'?2:0)&&S.draw.length){const c=S.draw.pop();S.hand.push(c);(S.nw=S.nw||[]).push(c.id)}srt()};
+function go(){S.draw=sh(S.cards.slice());S.hand=[];S.nw=[];S.pp=0;S.ps=0;S.sel.clear();S.score=0;S.hl=S.hands;S.dl=S.discards;if(bid()=='agulha')S.hl=1;if(bid()=='relogio')S.hl=Math.min(S.hl,2);if(bid()=='agua')S.dl=0;fill();S.scr='round';render()}
 function tg(id){if(busy)return;const was=S.sel.has(id);was?S.sel.delete(id):S.sel.size<5&&S.sel.add(id);S.tgl=[id,was?-1:1];snd(was?SF.de:SF.se);render()}
 function srtBy(k){S.sort=k;srt();render()}
-async function disc(){if(busy||!S.sel.size||S.dl<1)return;busy=1;S.dl--;S.rs.d++;snd(SF.dc);
+async function disc(){if(busy||!S.sel.size||S.dl<1)return;busy=1;S.dl--;if(bid()=='veneno')S.money=Math.max(0,S.money-1);S.rs.d++;snd(SF.dc);
 if(window.gsap){const e=[...document.querySelectorAll('#hd .cd.sel')];if(e.length){gsap.to(e,{y:-260,x:()=>gsap.utils.random(-80,80),rotation:()=>gsap.utils.random(-60,60),opacity:0,duration:.35,stagger:.04,ease:'power2.in'});await sl(350+40*e.length)}}
 dst(S.hand.filter(c=>S.sel.has(c.id)));S.sel.clear();fill();busy=0;render()}
 async function play(){if(busy||!S.sel.size||S.hl<1)return;busy=1;
@@ -143,7 +166,7 @@ for(let i=0;i<S.jokers.length;i++){const j=S.jokers[i],e=j.h&&j.h({h,pc,sc});if(
 P.hj=-1;P.tot=Math.round(ch*mu);S.rs.n++;if(P.tot>S.rs.best){S.rs.best=P.tot;S.rs.bn=HD[h][0]}render();snd(SF.tot);spark('.tot','#f5b244',26);kick(1.2);
 if(window.gsap){gsap.fromTo('.tot',{scale:2.6,opacity:0},{scale:1,opacity:1,duration:.55,ease:'bounce.out'});gsap.fromTo('#app',{x:-Math.min(26,6+Math.log10(P.tot+1)*4)},{x:0,duration:.6,ease:'elastic.out(1,.3)'})}
 await sl(950);S.score+=P.tot;S.pl=null;
-if(bid()=='dente')S.money=Math.max(0,S.money-1);
+if(bid()=='dente'||bid()=='ladrao')S.money=Math.max(0,S.money-(bid()=='ladrao'?2:1));
 if(bid()=='gancho')S.hand.sort(()=>Math.random()-.5).splice(0,2);
 fill();busy=0;if(S.score>=tgt())return win();if(S.hl<1){S.scr='over';snd(SF.lose);endRun(0);return render()}render()}
 function win(){confetti();coins(20);snd(SF.win);const r=[3,4,5][S.st],it=Math.min(S.ic,Math.floor(S.money/5)),gd=S.jokers.reduce((a,j)=>a+(j.g||0),0);
@@ -163,10 +186,10 @@ else if(!give(it))return;pop('#app>.pn.st>b','-$'+p,'#ff6b60',10);coins(6);S.mon
 function pick(i){if(i>=0&&!give(S.pack[i]))return;S.pack=null;render()}
 function reroll(){if(S.money<S.sp.rr)return fl('Dinheiro insuficiente');S.money-=S.sp.rr++;S.sp.l[0]=roll();S.sp.l[1]=rt();render()}
 function sj(i){S.money+=S.jokers[i].p>>1;S.jokers.splice(i,1);S.tip=null;render()}
-function use(i){if(busy)return;S.tip=null;snd(SF.jk);const t=S.cons[i];let cs=[];
+function use(i){if(busy)return;S.tip=null;snd(SF.jk);const t=S.cons[i];let cs=[];if(t.rd&&S.scr!='round')return fl('Use durante uma rodada');
 if(t.k){cs=S.hand?S.hand.filter(c=>S.sel.has(c.id)):[];if(S.scr!='round'||!cs.length||cs.length>t.k)return fl(S.scr=='round'?`Selecione 1 a ${t.k} cartas`:'Use durante uma rodada')}
 reveal(T.indexOf(t));t.f(cs);S.cons.splice(i,1);S.sel.clear();if(S.scr=='round')fill();render()}
-function info(){alert(HD.map((h,i)=>`${h[0]} Nv.${S.lv[i]}: ${h[1]+(S.lv[i]-1)*h[3]} × ${h[2]+(S.lv[i]-1)*h[4]}`).join('\n'))}
+function info(){S.lvm=1;S.pa=1;render()}
 
 const TP=['..#####..|.#ooooo#.|#oo#o#oo#|#o#ooo#o#|#ooooooo#|#o#ooo#o#|#oo#o#oo#|.#ooooo#.|..#####..',
 '#..#.#..#|.#.....#.|..#####..|#.#ooo#.#|..#ooo#..|#.#ooo#.#|..#####..|.#.....#.|#..#.#..#',
@@ -180,28 +203,34 @@ const TP=['..#####..|.#ooooo#.|#oo#o#oo#|#o#ooo#o#|#ooooooo#|#o#ooo#o#|#oo#o#oo#
 TP.push(...['#.......#|##..#..##|.##.#.##.|..#####..|..#ooo#..|.#######.|.#o#o#o#.|..#####..|.........', '....#....|...#o#...|..#ooo#..|.#ooooo#.|#ooooooo#|.#ooooo#.|..#ooo#..|...#o#...|....#....', '.##...##.|#oo#.#oo#|#ooo#ooo#|#ooooooo#|.#ooooo#.|..#ooo#..|...#o#...|....#....|.........', '....#....|...#o#...|..#ooo#..|.#ooooo#.|#ooooooo#|#oo#o#oo#|.##.#.##.|...###...|.........', '...###...|..#ooo#..|...#o#...|.##o#o##.|#ooo#ooo#|.##o#o##.|...#o#...|..#ooo#..|.#######.', '.###.###.|#ooo#ooo#|#o#o#o#o#|#ooo#ooo#|.###.###.|...#.#...|..#...#..|.........|.........', '..#####..|..#ooo#..|..#ooo#..|..#ooo#..|..#####..|#########|.#ooooo#.|..#####..|.........', '.....##..|....#oo#.|...#oo#..|..#oo#...|.#oo####.|#oo#..#o#|#o#...#o#|.#.....#.|.........', '....#....|.#..#..#.|..#.#.#..|...###...|#########|...###...|..#.#.#..|.#..#..#.|....#....', '.#####...|.#ooo#...|.#oo.##..|.#ooo#o#.|..####o#.|.....#o#.|.....###.|.........|.........', '.#.......|.#######.|.#ooooo#.|.#ooooo#.|.#######.|.#.......|.#.......|.#.......|###......', '..#####..|.#ooooo#.|#o#ooo#o#|#ooooooo#|#o#ooo#o#|#oo###oo#|.#ooooo#.|..#####..|.........', '.#######.|#ooooooo#|#o##o##o#|#o##o##o#|#ooo#ooo#|.#ooooo#.|..#o#o#..|..#####..|.........', '#...#...#|##.###.##|#o#ooo#o#|#ooooooo#|#ooooooo#|#########|.........|.........|.........', '..#####..|.#ooooo#.|#oo###oo#|#o#o#o#o#|#oo###oo#|.#ooooo#.|..#####..|.........|.........'].map(x=>x.split('|').join('')));
 const TR=['XXI','XIX','XVII','XVIII','XI','XII','III','V','IX'],TCL=['#4aa3ff','#ffb21e','#ffe27a','#c9b6ff','#ff7a5c','#9aa6b2','#ff6fa5','#8be28b','#ffcf5a'];
 J.forEach((j,i)=>{TR.push('★');TCL.push(`hsl(${i*53%360},80%,65%)`)});
-function tar(i){let r='';[...TP[i]].forEach((c,k)=>{if(c!='.')r+=`<rect x="${12+k%9*4}" y="${24+(k/9|0)*4}" width="4" height="4" fill="${c=='#'?'#f5d27a':TCL[i]}"/>`});
+const JB=100,gnp=s=>{let r='',x=(s*2654435761>>>0)||1;const R=()=>(x=(x*1103515245+12345)>>>0)/4294967296;for(let y=0;y<9;y++){const h=[];for(let k=0;k<5;k++){const v=R();h.push(v<.35?'.':v<.6?'o':'#')}r+=h.concat(h.slice(0,4).reverse()).join('')}return r};
+const patf=i=>i>=JB?(i-JB<15?TP[9+i-JB]:gnp(i+500)):i<9?TP[i]:gnp(i+300),clf=i=>i<9?TCL[i]:`hsl(${(i>=JB?i-JB:i+7)*53%360},80%,65%)`,rmf=i=>i>=JB?'★':(['XXI','XIX','XVII','XVIII','XI','XII','III','V','IX','XIV','XV','XVI','XX','VI','VIII','IV','II','I'][i]||'★');
+function tar(i){let r='';[...patf(i)].forEach((c,k)=>{if(c!='.')r+=`<rect x="${12+k%9*4}" y="${24+(k/9|0)*4}" width="4" height="4" fill="${c=='#'?'#f5d27a':clf(i)}"/>`});
 const q=(x,y,f='#f5b244')=>`<rect x="${x}" y="${y}" width="4" height="4" fill="${f}"/>`;
-return`<svg viewBox="0 0 60 84" shape-rendering="crispEdges"><rect width="60" height="84" rx="4" fill="#0f171a"/><rect x="2" y="2" width="56" height="80" rx="3" fill="#25134a" stroke="#f5b244" stroke-width="2"/><rect x="2" y="2" width="56" height="30" rx="3" fill="#3b2263" opacity=".55"/><rect x="6" y="6" width="48" height="72" fill="none" stroke="#f5d27a" stroke-width="1"/>${q(5,5)}${q(51,5)}${q(5,75)}${q(51,75)}<circle cx="30" cy="42" r="22" fill="${TCL[i]}" opacity=".16"/><circle cx="30" cy="42" r="22" fill="none" stroke="#f5b244" stroke-width="1" stroke-dasharray="2 2"/>${q(14,12,'#f5d27a')}${q(42,12,'#f5d27a')}${q(10,40,'#8a5fd0')}${q(46,40,'#8a5fd0')}${q(18,64,'#8a5fd0')}${q(38,64,'#8a5fd0')}${r}<text x="30" y="17" font-size="7" text-anchor="middle" fill="#f5d27a" font-family="Courier New,monospace" font-weight="700">${TR[i]}</text>${q(22,69)}${q(28,69,'#fff')}${q(34,69)}</svg>`}
+return`<svg viewBox="0 0 60 84" shape-rendering="crispEdges"><rect width="60" height="84" rx="4" fill="#0f171a"/><rect x="2" y="2" width="56" height="80" rx="3" fill="#25134a" stroke="#f5b244" stroke-width="2"/><rect x="2" y="2" width="56" height="30" rx="3" fill="#3b2263" opacity=".55"/><rect x="6" y="6" width="48" height="72" fill="none" stroke="#f5d27a" stroke-width="1"/>${q(5,5)}${q(51,5)}${q(5,75)}${q(51,75)}<circle cx="30" cy="42" r="22" fill="${clf(i)}" opacity=".16"/><circle cx="30" cy="42" r="22" fill="none" stroke="#f5b244" stroke-width="1" stroke-dasharray="2 2"/>${q(14,12,'#f5d27a')}${q(42,12,'#f5d27a')}${q(10,40,'#8a5fd0')}${q(46,40,'#8a5fd0')}${q(18,64,'#8a5fd0')}${q(38,64,'#8a5fd0')}${r}<text x="30" y="17" font-size="7" text-anchor="middle" fill="#f5d27a" font-family="Courier New,monospace" font-weight="700">${rmf(i)}</text>${q(22,69)}${q(28,69,'#fff')}${q(34,69)}</svg>`}
 function reveal(i){if(!window.gsap)return;const d=document.createElement('div');d.className='rv';d.innerHTML=tar(i);document.body.appendChild(d);
 gsap.fromTo(d,{scale:.2,rotationY:180,opacity:0,transformPerspective:600},{scale:1,rotationY:0,opacity:1,duration:.5,ease:'back.out(1.6)',onComplete:()=>spark('.rv','#f5d27a',22)});
 gsap.to(d,{scale:1.7,opacity:0,y:-90,duration:.45,delay:1,ease:'power2.in',onComplete:()=>d.remove()})}
 const EM=['🃏','🍬','💘','🗡️','😡','🧠','🎩','🏃','🧊','👯','🚩','😀','☠️','👑','🐷'];
-const ico=it=>it.t=='j'?tar(9+J.indexOf(it.o)):it.t=='t'?tar(T.indexOf(it.o)):it.t=='p'?'🪐':it.t=='v'?'🎟️':'📦';
-const FC={11:'🛡️',12:'👸',13:'🤴'},TE=['🌍','☀️','⭐','🌙','💪','🪢','👑','📜','🏮'];
+const ico=it=>it.t=='j'?tar(JB+J.indexOf(it.o)):it.t=='t'?tar(T.indexOf(it.o)):it.t=='p'?'🪐':it.t=='v'?'🎟️':'📦';
+EM.push('🍀','🅰️','⚔️','🏁','❄️','🏠','🧍','🤏','✋','🛟','⛏️','👸','🗡️','🍎','🔲');const FC={11:'🛡️',12:'👸',13:'🤴'},TE=['🌍','☀️','⭐','🌙','💪','🪢','👑','📜','🏮'];
 const cd=(c,k='')=>`<div class="cd s${c.s} ${k} ${deb(c)?'deb':''}" data-id="${c.id}" ${c.r>10&&c.r<14?`data-f="${FC[c.r]}"`:''} onclick="tg(${c.id})"><b>${RL(c.r)}</b><span>${SU[c.s]}</span>${c.ch?`<u>+${c.ch}</u>`:''}${c.mu?`<u class="m">+${c.mu}</u>`:''}</div>`;
-const jr=()=>`<div class="st" style="font-size:11px;color:var(--m)"><span>Coringas ${S.jokers.length}/${S.js}</span><span>Tarôs ${S.cons.length}/${S.cs}</span></div><div class="row">${Array.from({length:S.js},(_,i)=>{const j=S.jokers[i];return j?`<div class="jk tcj ${S.pl&&S.pl.hj==i?'hl':''}" onclick="tip('j',${i})"><i>${tar(9+J.indexOf(j))}</i></div>`:'<div class="jk em"></div>'}).join('')}</div>
+const jr=()=>`<div class="st" style="font-size:11px;color:var(--m)"><span>Coringas ${S.jokers.length}/${S.js}</span><span>Tarôs ${S.cons.length}/${S.cs}</span></div><div class="row">${Array.from({length:S.js},(_,i)=>{const j=S.jokers[i];return j?`<div class="jk tcj ${S.pl&&S.pl.hj==i?'hl':''}" onclick="tip('j',${i})"><i>${tar(JB+J.indexOf(j))}</i></div>`:'<div class="jk em"></div>'}).join('')}</div>
 <div class="row cons">${Array.from({length:S.cs},(_,i)=>{const t=S.cons[i];return t?`<div class="tc" onclick="tip('c',${i})">${tar(T.indexOf(t))}</div>`:'<div class="tc em"></div>'}).join('')}</div>`;
 function tip(k,i){if(busy)return;S.tip={k,i};S.ta=1;render()}
-const tipH=()=>{if(!S.tip)return'';const{k,i}=S.tip,o=k=='j'?S.jokers[i]:S.cons[i];if(!o)return'';return`<div class="tip pn"><div style="float:left;width:46px;margin-right:10px">${tar(k=='c'?T.indexOf(o):9+J.indexOf(o))}</div><b>${o.n}</b><div style="color:var(--m);font-weight:400;margin:4px 0 8px">${o.d}</div><div class="row" style="clear:both">${k=='j'?`<button class="o" style="flex:1" onclick="sj(${i})">Vender $${o.p>>1}</button>`:`<button style="flex:1" onclick="use(${i})">Usar</button>`}<button class="s" onclick="S.tip=null;render()">Fechar</button></div></div>`};
+const tipH=()=>{if(!S.tip)return'';const{k,i}=S.tip,o=k=='j'?S.jokers[i]:S.cons[i];if(!o)return'';return`<div class="tip pn"><div style="float:left;width:46px;margin-right:10px">${tar(k=='c'?T.indexOf(o):JB+J.indexOf(o))}</div><b>${o.n}</b><div style="color:var(--m);font-weight:400;margin:4px 0 8px">${o.d}</div><div class="row" style="clear:both">${k=='j'?`<button class="o" style="flex:1" onclick="sj(${i})">Vender $${o.p>>1}</button>`:`<button style="flex:1" onclick="use(${i})">Usar</button><button class="o" onclick="sct(${i})">Vender $${o.p>>1}</button>`}<button class="s" onclick="S.tip=null;render()">Fechar</button></div></div>`};
 const tp=()=>`<div class="pn st"><span>Ante <b style="font-size:18px">${S.ante}</b>/8</span><b style="color:var(--g);font-size:22px">$${S.money}</b><span><button class="s" onclick="info()">Níveis</button><button class="s" onclick="MUTE^=1;render()">${MUTE?'🔇':'🔊'}</button></span></div>`;
 const itm=(it,i)=>{if(!it)return`<div class="pn" style="opacity:.4;text-align:center">Vendido</div>`;const x=inf(it);return`<button class="it" onclick="buy(${i})"><i>${ico(it)}</i><span style="flex:1"><b>${x.n}</b><small>${x.d}</small></span><b style="color:var(--g);font-size:18px">$${pr(x.p||3)}</b></button>`};
+const lvH=()=>S.lvm?`<div class="ov"><h2>Níveis das mãos</h2><div class="pn">${HD.map((h,i)=>`<div class="st" style="padding:3px 0"><span>${h[0]} <small style="color:var(--m)">Nv.${S.lv[i]}</small></span><b><span style="color:#5bb8ff">${h[1]+(S.lv[i]-1)*h[3]}</span> × <span style="color:#ff8a80">${h[2]+(S.lv[i]-1)*h[4]}</span></b></div>`).join('')}</div><button onclick="S.lvm=0;render()">Fechar</button></div>`:'';
+const dkH=()=>S.dkm?`<div class="ov"><h2>Baralho</h2><div class="pn">${[0,1,2,3].map(k=>`<div class="st" style="justify-content:flex-start;gap:4px;flex-wrap:wrap;padding:3px 0"><b class="cd s${k}" style="flex:none;width:24px;aspect-ratio:auto;display:block;text-align:center;font-size:16px;padding:0;box-shadow:none;top:0">${SU[k]}</b>${S.cards.filter(c=>c.s==k).sort((a,b)=>b.r-a.r).map(c=>`<span style="font-size:13px;width:18px;text-align:center;opacity:${!S.draw||S.draw.includes(c)?1:.3}">${RL(c.r)}</span>`).join('')}</div>`).join('')}<small style="color:var(--m)">Restam ${S.draw?S.draw.length:S.cards.length} de ${S.cards.length}. Cartas apagadas já saíram do monte.</small></div><button onclick="S.dkm=0;render()">Fechar</button></div>`:'';
+function sct(i){S.money+=S.cons[i].p>>1;S.cons.splice(i,1);S.tip=null;render()}
 const BC=['var(--b)','var(--o)','var(--r)'];
 const scr={
-menu:()=>`<div class="gd" style="width:84px;margin:14px auto 0">${GOD}</div><h1 style="margin-top:6px">${[...'CORINGA'].map(c=>`<span>${c}</span>`).join('')}</h1><div class="msg">${CF.runs?`Melhor mão ${N(CF.bh)} · Ante ${CF.ba}/8 · Vitórias ${CF.wins}`:'Sua jornada começa aqui'}</div><button class="it" onclick="S={scr:'decks'};render()"><i>▶️</i><span><b>Jogar</b><small>Escolha um baralho e comece</small></span></button><button class="it" onclick="tutStart()"><i>📖</i><span><b>Tutorial</b><small>Arcanus ensina tudo${CF.td?'':' ★ novo'}</small></span></button><button class="it" onclick="S={scr:'opts'};render()"><i>⚙️</i><span><b>Opções</b><small>Volume, vibração e recordes</small></span></button>`,
+col:()=>{const t=S.ct?1:0,L=t?T:J,i=S.cx>=0&&S.cx<L.length?S.cx:0,o=L[i],a=k=>t?T.indexOf(k):JB+J.indexOf(k);return`<h2 style="margin-top:20px">Coleção</h2><div class="row"><button class="s" style="flex:1;${t?'':'background:var(--b)'}" onclick="S.ct=0;S.cx=0;S.cta=1;render()">Coringas (${J.length})</button><button class="s" style="flex:1;${t?'background:var(--b)':''}" onclick="S.ct=1;S.cx=0;S.cta=1;render()">Tarôs (${T.length})</button></div><div class="cdt pn" style="display:flex;gap:10px;align-items:center;position:sticky;top:0;z-index:2"><div style="width:62px;flex:none">${tar(a(o))}</div><div><b style="color:var(--g)">${o.n}</b><div style="font-weight:400;font-size:13px;margin:4px 0;color:var(--m)">${o.d}</div><small>${t?'Tarô · $'+o.p:'Coringa · $'+o.p+' · venda $'+(o.p>>1)}</small></div></div><div class="cg" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:6px 2px">${L.map((k,j)=>`<div class="jk tcj ${j==i?'hl':''}" onclick="S.cx=${j};S.cta=1;render()"><i>${tar(a(k))}</i></div>`).join('')}</div><button class="s" onclick="S={scr:'menu'};render()">Voltar</button>`},
+menu:()=>`<div class="gd" style="width:84px;margin:14px auto 0">${GOD}</div><h1 style="margin-top:6px">${[...'CORINGA'].map(c=>`<span>${c}</span>`).join('')}</h1><div class="msg">${CF.runs?`Melhor mão ${N(CF.bh)} · Ante ${CF.ba}/8 · Vitórias ${CF.wins}`:'Sua jornada começa aqui'}</div><button class="it" onclick="S={scr:'decks'};render()"><i>▶️</i><span><b>Jogar</b><small>Escolha um baralho e comece</small></span></button><button class="it" onclick="tutStart()"><i>📖</i><span><b>Tutorial</b><small>Arcanus ensina tudo${CF.td?'':' ★ novo'}</small></span></button><button class="it" onclick="S={scr:'col'};render()"><i>🃏</i><span><b>Coleção</b><small>Veja todos os coringas e tarôs</small></span></button><button class="it" onclick="S={scr:'opts'};render()"><i>⚙️</i><span><b>Opções</b><small>Volume, vibração e recordes</small></span></button>`,
 decks:()=>`<h2 style="margin-top:20px">Escolha seu baralho</h2>${DK.map((d,i)=>`<button class="it" onclick="newRun(${i})"><i>${['🟥','🟦','⬛','👻'][i]}</i><span><b>${d[0]}</b><small>${d[1]}</small></span></button>`).join('')}<button class="s" onclick="S={scr:'menu'};render()">Voltar</button>`,
 opts:()=>`<h2 style="margin-top:20px">Opções</h2><div class="pn">Música<input type="range" min="0" max="100" value="${Math.round(CF.mv*100)}" oninput="setV('mv',this.value/100)">Efeitos<input type="range" min="0" max="100" value="${Math.round(CF.sv*100)}" oninput="setV('sv',this.value/100)" onchange="snd(SF.buy)"><button class="s" onclick="MUTE^=1;render()">Som: ${MUTE?'DESLIGADO':'LIGADO'}</button><button class="s" onclick="CF.vib^=1;svc();vib(60);render()">Vibração: ${CF.vib?'LIGADA':'DESLIGADA'}</button></div><div class="pn msg">Melhor mão ${N(CF.bh)} · Ante ${CF.ba}/8 · Vitórias ${CF.wins}/${CF.runs}</div><button class="o" onclick="if(confirm('Apagar recordes?')){CF.runs=CF.wins=CF.bh=CF.ba=0;svc();render()}">Apagar recordes</button><button onclick="S={scr:'menu'};render()">Voltar</button>`,
-blind:()=>{S.boss=S.bosses[S.ante]??=rnd(B);return`${tp()}<div class="msg">${S.msg}</div>${[0,1,2].map(i=>`<div class="pn" style="border-left:10px solid ${BC[i]};${i==S.st?'':'opacity:.4'}"><div class="st"><b style="font-size:16px">${i==2?S.boss.n:BL[i]}</b><span>Meta <b style="color:var(--r)">${N([300,800,2000,5000,11000,20000,35000,50000][S.ante-1]*[1,1.5,2][i]*(i==2&&S.boss.id=='muro'?2:1))}</b> · <b style="color:var(--g)">+$${[3,4,5][i]}</b></span></div>${i==2?`<div class="rd">${S.boss.d}</div>`:''}</div>`).join('')}<button class="y" onclick="go()">Jogar blind</button>${jr()}`},
+blind:()=>{S.boss=S.bosses[S.ante]??=rnd(B);return`${tp()}<div class="msg">${S.msg}</div>${[0,1,2].map(i=>`<div class="pn" style="border-left:10px solid ${BC[i]};${i==S.st?'':'opacity:.4'}"><div class="st"><b style="font-size:16px">${i==2?S.boss.n:BL[i]}</b><span>Meta <b style="color:var(--r)">${N([300,800,2000,5000,11000,20000,35000,50000][S.ante-1]*[1,1.5,2][i]*(i==2?{muro:2,relogio:.6}[S.boss.id]||1:1))}</b> · <b style="color:var(--g)">+$${[3,4,5][i]}</b></span></div>${i==2?`<div class="rd">${S.boss.d}</div>`:''}</div>`).join('')}<button class="y" onclick="go()">Jogar blind</button>${jr()}`},
 round:()=>{const P=S.pl,pc=P?P.pc:S.hand.filter(c=>S.sel.has(c.id));let hn='&nbsp;',ch='',mu='';
 if(pc.length){const h=P?P.h:ev(pc).h,L=S.lv[h]-1,H=HD[h];hn=`${H[0]} Nv.${L+1}`;ch=P?P.ch:H[1]+L*H[3];mu=P?P.mu:H[2]+L*H[4]}
 const t=tgt();return`${tp()}
@@ -210,7 +239,7 @@ ${jr()}
 <div class="pn" style="text-align:center;min-height:136px"><div>${hn}</div><div class="sc"><span class="ch">${ch}</span>×<span class="mu">${mu}</span></div>${P&&P.tot?`<div class="tot">= ${N(P.tot)}</div>`:!P&&pc.length?`<div class="msg" style="font-size:13px">≈ ${N(estp(pc))} pontos</div>`:''}<div class="hand" style="padding-top:8px">${P?P.pc.map(c=>cd(c,P.hi==c.id?'hi':'').replace(/onclick="[^"]*"/,'')).join(''):''}</div></div>
 <div class="msg">${S.msg}</div><div class="hand" id="hd">${S.hand.map(c=>cd(c,S.sel.has(c.id)?'sel':'')).join('')}</div>
 <div class="row"><button style="flex:1" onclick="play()" ${S.sel.size&&S.hl&&!busy?'':'disabled'}>Jogar (${S.hl})</button><button class="o" style="flex:1" onclick="disc()" ${S.sel.size&&S.dl&&!busy?'':'disabled'}>Descartar (${S.dl})</button></div>
-<div class="st"><span><button class="s" onclick="srtBy('r')">Valor</button><button class="s" onclick="srtBy('s')">Naipe</button></span><span><i class="bk"></i>${S.draw.length}/${S.cards.length}</span></div>`},
+<div class="st"><span><button class="s" onclick="srtBy('r')">Valor</button><button class="s" onclick="srtBy('s')">Naipe</button><button class="s" onclick="S.dkm=1;S.pa=1;render()">Baralho</button></span><span><i class="bk"></i>${S.draw.length}/${S.cards.length}</span></div>`},
 shop:()=>`${tp()}<h2>Loja</h2><div class="msg">${S.rep}${S.msg?'<br>'+S.msg:''}</div>${S.sp.l.map(itm).join('')}<div class="row"><button class="s" style="flex:1" onclick="reroll()">Reroll $${S.sp.rr}</button><button class="y" style="flex:2" onclick="S.scr='blind';render()">Próxima blind</button></div>${jr()}
 ${S.pack?`<div class="ov"><h2>Escolha 1</h2>${S.pack.map((it,i)=>{const x=inf(it);return`<button class="it" onclick="pick(${i})"><i>${ico(it)}</i><span><b>${x.n}</b><small>${x.d}</small></span></button>`}).join('')}<div class="msg">${S.msg}</div><button class="s" onclick="pick(-1)">Pular</button></div>`:''}`,
 over:()=>`<h1><span>FIM</span></h1><div class="pn msg">Você caiu no Ante ${S.ante} (${BL[S.st]}) com ${N(S.score)} de ${N(tgt())} pontos.</div>${rsum()}<button class="o" onclick="S={scr:'decks'};render()">Jogar de novo</button><button class="s" onclick="S={scr:'menu'};render()">Menu</button>`,
@@ -228,11 +257,12 @@ float v=sin(p.x*1.3+p.y)*.5+.5,w=sin(length(p)*2.+t*.3)*.5+.5;
 vec3 c=mix(c3,c1,smoothstep(.25,.6,v));c=mix(c,c2,smoothstep(.45,.8,w)*.85);c*=.8+.2*step(.08,fract(v*4.));c+=k*.16+step(.997,fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233))+floor(t*1.5))*43758.5453))*.4;c=floor(c*7.+.5)/7.;gl_FragColor=vec4(c,1.);}`}));
 m.frustumCulled=false;sc.add(m);const rs=()=>{R.setSize(innerWidth,innerHeight,false);U.r.value.set(cv.width,cv.height)};rs();addEventListener('resize',rs);
 let pt=0;const lp=t=>{U.t.value+=(t-pt)/1000*U.sp.value;pt=t;R.render(sc,cm);requestAnimationFrame(lp)};lp(0)}
-function render(){const nsc=S.last!=S.scr;if(nsc)S.tip=null;S.last=S.scr;$a.innerHTML=scr[S.scr]()+tipH()+tutH();moodUp(nsc);tuHL();if(!window.gsap)return;
-if(nsc){gsap.from('#app>*',{y:26,opacity:0,duration:.35,stagger:.05,ease:'back.out(2)'});
+function render(){const nsc=S.last!=S.scr;if(nsc)S.tip=null;S.last=S.scr;$a.innerHTML=scr[S.scr]()+tipH()+tutH()+lvH()+dkH();moodUp(nsc);tuHL();if(!window.gsap)return;
+if(nsc){gsap.from('#app>*',{y:26,opacity:0,duration:.35,stagger:.05,ease:'back.out(2)'});gsap.from('.cg .tcj',{scale:.4,opacity:0,rotation:()=>gsap.utils.random(-25,25),duration:.4,stagger:.025,ease:'back.out(2)'});
 if(S.scr=='round'&&bs())gsap.fromTo('#app',{x:-14},{x:0,duration:.9,delay:.35,ease:'elastic.out(1,.25)'});if(S.scr=='menu')gsap.to('h1 span',{y:-8,repeat:-1,yoyo:true,stagger:.1,duration:.6,ease:'sine.inOut'})}
 if(S.nw&&S.nw.length){const e=[...document.querySelectorAll('#hd .cd')].filter(x=>S.nw.includes(+x.dataset.id));e.length&&gsap.from(e,{y:280,rotation:()=>gsap.utils.random(-30,30),opacity:0,duration:.5,stagger:.05,ease:'back.out(1.4)'});e.length&&snd(SF.dl);S.nw=[]}
 if(S.tgl){const e=document.querySelector(`#hd .cd[data-id="${S.tgl[0]}"]`);e&&gsap.from(e,{y:24*S.tgl[1],duration:.2,ease:'back.out(3)'});S.tgl=null}
+if(S.cta){gsap.from('.cdt',{y:30,opacity:0,duration:.3,ease:'back.out(2)'});gsap.from('.cdt>div:first-child',{rotationY:180,scale:.5,duration:.5,ease:'back.out(1.7)',transformPerspective:600});S.cta=0}
 if(S.ta){gsap.from('.tip',{y:90,opacity:0,duration:.25,ease:'back.out(2)'});S.ta=0}
 if(S.pa){gsap.from('.ov>*',{scale:.6,opacity:0,duration:.35,stagger:.08,ease:'back.out(2)'});S.pa=0}
 if(S.scr=='round'){const p=Math.min(100,S.score/tgt()*100);gsap.fromTo('.bar i',{width:(S.pp||0)+'%'},{width:p+'%',duration:.7,ease:'power2.out'});S.pp=p;if(S.ps!=S.score){const o={v:S.ps||0};gsap.to(o,{v:S.score,duration:.9,ease:'power2.out',onUpdate:()=>{const x=document.getElementById('sv');x&&(x.textContent=N(o.v))}});S.ps=S.score}}}
@@ -241,7 +271,7 @@ const SF={se:[[520,.07,'square',.07,780]],de:[[520,.07,'square',.06,330]],ck:[[4
 jk:[[700,.08,'square',.08],[1050,.14,'square',.08,0,.08]],tot:[[523,.1],[659,.1,'square',.08,0,.1],[784,.1,'square',.08,0,.2],[1047,.35,'square',.09,0,.3]],
 win:[[523,.12],[659,.12,'square',.08,0,.12],[784,.12,'square',.08,0,.24],[1047,.12,'square',.08,0,.36],[784,.1,'square',.08,0,.48],[1047,.4,'square',.09,0,.58]],
 lose:[[400,.25,'sawtooth',.09,120],[300,.25,'sawtooth',.09,80,.25],[200,.5,'sawtooth',.09,50,.5]],buy:[[988,.07],[1319,.22,'square',.07,0,.07]]};
-function snd(a){vibS(a);if(MUTE)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();const t=AC.currentTime;a.forEach(([f,d,w,v,e,dl])=>{const o=AC.createOscillator(),g=AC.createGain(),b=t+(dl||0);o.type=w||'square';o.frequency.setValueAtTime(f,b);e&&o.frequency.exponentialRampToValueAtTime(e,b+d);g.gain.setValueAtTime(v||.08,b);g.gain.exponentialRampToValueAtTime(.001,b+d);o.connect(g);g.connect(SGN());o.start(b);o.stop(b+d+.02)})}catch(x){}}
+function snd(a){vibS(a);if(MUTE||document.hidden)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume();const t=AC.currentTime;a.forEach(([f,d,w,v,e,dl])=>{const o=AC.createOscillator(),g=AC.createGain(),b=t+(dl||0);o.type=w||'square';o.frequency.setValueAtTime(f,b);e&&o.frequency.exponentialRampToValueAtTime(e,b+d);g.gain.setValueAtTime(v||.08,b);g.gain.exponentialRampToValueAtTime(.001,b+d);o.connect(g);g.connect(SGN());o.start(b);o.stop(b+d+.02)})}catch(x){}}
 document.addEventListener('click',e=>{mus();if(e.target.closest&&e.target.closest('button'))snd(SF.ck)});
 
 const MU={mood:'',step:0,next:0,g:null,nb:null};
@@ -257,7 +287,7 @@ function mus(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
 function mn(f,t,d,w,v){const o=AC.createOscillator(),g=AC.createGain();o.type=w;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(MU.g);o.start(t);o.stop(t+d+.02)}
 function nz(t,d,v,hp){const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=MU.nb;f.type='highpass';f.frequency.value=hp;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(f);f.connect(g);g.connect(MU.g);s.start(t);s.stop(t+d+.02)}
 function kk(t,v){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.16);o.connect(g);g.connect(MU.g);o.start(t);o.stop(t+.18)}
-function mtick(){if(!MU.g||MUTE||!MU.mood)return;const m=MP[MU.mood];if(MU.next<AC.currentTime)MU.next=AC.currentTime+.05;const sp=60/m.bpm/4;
+function mtick(){if(!MU.g||MUTE||document.hidden||!MU.mood)return;const m=MP[MU.mood];if(MU.next<AC.currentTime)MU.next=AC.currentTime+.05;const sp=60/m.bpm/4;
 while(MU.next<AC.currentTime+.15){const t=MU.next,s=MU.step++,i=s&15,tr=(MU.mood=='danger'?[0,0,1,0]:[0,0,-2,3])[(s>>4)&3];
 if(m.b[i])mn(NT(m.b[i]+tr),t,sp*1.9,MU.mood=='danger'||MU.mood=='boss'?'sawtooth':'triangle',MU.mood=='danger'?.1:.14);
 if(m.l[i])mn(NT(m.l[i]+tr),t,sp*1.4,m.w,m.lv);
@@ -279,7 +309,8 @@ if(nsc&&S.scr=='over'&&window.gsap)gsap.fromTo('#app',{x:-22},{x:0,duration:1,ea
 let CF={mv:.7,sv:1,vib:1,runs:0,wins:0,bh:0,ba:0,td:0};try{Object.assign(CF,JSON.parse(localStorage.cf))}catch(e){}
 const svc=()=>{try{localStorage.cf=JSON.stringify(CF)}catch(e){}};
 let SG;const SGN=()=>{if(!SG){SG=AC.createGain();SG.gain.value=CF.sv;SG.connect(AC.destination)}return SG};
-const vib=p=>{try{CF.vib&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+const vib=p=>{try{CF.vib&&!document.hidden&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+document.addEventListener('visibilitychange',()=>{try{if(document.hidden){navigator.vibrate&&navigator.vibrate(0);AC&&AC.suspend()}else AC&&AC.resume()}catch(e){}});
 function vibS(a){if(a==SF.pl)vib(15);else if(a==SF.tot)vib(45);else if(a==SF.win)vib([60,40,120]);else if(a==SF.lose)vib(350);else if(a==SF.buy)vib([15,30,15]);else if(a==SF.se||a==SF.de)vib(6);else if(a==SF.dc)vib(22)}
 function setV(k,v){CF[k]=+v;svc();if(k=='mv'&&MU.g)MU.g.gain.value=.32*CF.mv;if(k=='sv'&&SG)SG.gain.value=CF.sv}
 function endRun(w){CF.runs++;CF.wins+=w;CF.bh=Math.max(CF.bh,S.rs.best);CF.ba=Math.max(CF.ba,S.ante);svc()}
